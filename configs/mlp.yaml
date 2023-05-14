@@ -6,6 +6,7 @@ d_layers: [128, 256, 128]
 learning_rate: 0.00001
 weight_decay: 0.0
 batch_size: 100
+epochs: 300
 
 data: processed
 use_ple: false

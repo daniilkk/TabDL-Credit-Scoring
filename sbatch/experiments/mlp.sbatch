@@ -18,6 +18,6 @@ source activate venv
 
 export PYTHONPATH=$(pwd)
 
-for _ in $(seq 1 1); do
+for _ in $(seq 1 4); do
     python -u src/run.py --config configs/mlp.yaml
 done

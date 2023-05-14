@@ -98,7 +98,7 @@ def train_neural_model(config: DictConfig):
 
     trainer = Trainer(model, data_module, optimizer, loss_fn, run_dir)
     trainer.train(
-        n_epochs=1000,
+        n_epochs=config.epochs,
         batch_size=config.batch_size,
         report_frequency=1000
     )
