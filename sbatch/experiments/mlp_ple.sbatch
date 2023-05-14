@@ -16,6 +16,8 @@ module load Python
 deactivate
 conda activate venv
 
+pip install -r requirements.txt
+
 export PYTHONPATH=$(pwd)
 
 for _ in $(seq 1 5); do
