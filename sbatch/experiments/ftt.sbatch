@@ -13,8 +13,12 @@
 module purge
 module load Python
 
+conda init bash 
+
 deactivate
-conda activate venv
+source activate venv
+
+pip install -r requirements.txt
 
 export PYTHONPATH=$(pwd)
 
