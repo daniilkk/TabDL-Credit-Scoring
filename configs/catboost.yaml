@@ -1,0 +1,9 @@
+model_type: catboost
+experiment_name: catboost
+
+iterations: 1000
+learning_rate: null
+
+data: processed
+split_method: customer_id
+train_size: 0.8
