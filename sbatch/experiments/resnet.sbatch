@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --job-name=resnet           # Название задачи
+#SBATCH --error=output/resnet-%j.err        # Файл для вывода ошибок
+#SBATCH --output=output/resnet.log       # Файл для вывода результатов
+
+#SBATCH --ntasks=1                # Количество MPI процессов
+#SBATCH --nodes=1                  # Требуемое кол-во узлов
+#SBATCH --gpus=1                   # Требуемое кол-во GPU
+#SBATCH --cpus-per-task=8          # Требуемое кол-во CPU
+#SBATCH --time=200
+
+module purge
+module load Python
+
+deactivate
+conda activate venv
+
+export PYTHONPATH=$(pwd)
+
+for _ in $(seq 1 4); do
+    python -u src/run.py --config configs/resnet.yaml
+done
