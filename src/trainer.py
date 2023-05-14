@@ -49,7 +49,7 @@ class Trainer:
                 loss = self.loss_fn(predict, y_batch)
                 loss.backward()
 
-                epoch_losses.append(loss.detach().numpy())
+                epoch_losses.append(loss.detach().cpu().numpy())
                 
                 self.optimizer.step()
                 
