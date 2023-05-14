@@ -1,0 +1,14 @@
+model_type: mlp
+experiment_name: mlp_ple
+
+model: mlp_base
+d_layers: [128, 256, 128]
+learning_rate: 0.00001
+weight_decay: 0.0
+batch_size: 100
+
+data: processed
+use_ple: true
+ple_n_bins: 20
+split_method: customer_id
+train_size: 0.8
