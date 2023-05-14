@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=mlp           # Название задачи
 #SBATCH --error=output/mlp-%j.err        # Файл для вывода ошибок
-#SBATCH --output=output/mlp-%j.log       # Файл для вывода результатов
+#SBATCH --output=output/mlp.log       # Файл для вывода результатов
 
 #SBATCH --ntasks=1                # Количество MPI процессов
 #SBATCH --nodes=1                  # Требуемое кол-во узлов
