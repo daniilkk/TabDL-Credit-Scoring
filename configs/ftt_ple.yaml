@@ -9,5 +9,6 @@ epochs: 70
 
 data: processed
 use_ple: true
+ple_n_bins: 20
 split_method: customer_id
 train_size: 0.8
