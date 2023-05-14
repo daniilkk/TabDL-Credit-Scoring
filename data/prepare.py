@@ -195,7 +195,7 @@ def main(args: argparse.Namespace):
     # Change 'Standard' label to 'Good', so there are only 'Good' and 'Bad' now.
     df['Credit_Score'] = df['Credit_Score'].replace({'Standard': 'Good'})
 
-    df.drop(columns='Credit_Mix', inplace=True)
+    # df.drop(columns='Credit_Mix', inplace=True)
 
     df.to_csv(args.destination, index=False)
 
