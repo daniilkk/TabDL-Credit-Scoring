@@ -5,6 +5,7 @@ model: ft_transformer
 learning_rate: 0.0003
 weight_decay: 0.0001
 batch_size: 32
+epochs: 300
 
 data: processed
 use_ple: true
