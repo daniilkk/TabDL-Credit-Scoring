@@ -14,7 +14,7 @@ module purge
 module load Python
 
 deactivate
-conda activate venv
+source activate venv
 
 pip install -r requirements.txt
 
