@@ -7,13 +7,14 @@
 #SBATCH --ntasks=1                # Количество MPI процессов
 #SBATCH --nodes=1                  # Требуемое кол-во узлов
 #SBATCH --gpus=1                   # Требуемое кол-во GPU
-#SBATCH --cpus-per-task=8          # Требуемое кол-во CPU
-#SBATCH --time=200
+#SBATCH --cpus-per-task=4          # Требуемое кол-во CPU
+#SBATCH --time=300
 
 module purge
 module load Python
 
 conda init bash 
+source /home/dkrasilnikov/.bashrc
 
 deactivate
 source activate venv
