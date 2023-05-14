@@ -3,7 +3,8 @@ experiment_name: ftt
 
 model: ft_transformer
 learning_rate: 0.0003
-weight_decay: 0.005
+#best 0.005
+weight_decay: 0.01
 batch_size: 32
 epochs: 300
 
