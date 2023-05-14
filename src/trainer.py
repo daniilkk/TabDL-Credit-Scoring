@@ -53,8 +53,8 @@ class Trainer:
                 
                 self.optimizer.step()
                 
-                if iteration % report_frequency == 0:
-                    print(f'(epoch) {epoch:3d} (iteration) {iteration:5d} (loss) {loss.item():.4f}')
+                # if iteration % report_frequency == 0:
+                #     print(f'(epoch) {epoch:3d} (iteration) {iteration:5d} (loss) {loss.item():.4f}')
 
             train_metrics, train_loss = self._evaluate('train', batch_size)
             val_metrics, val_loss = self._evaluate('val', batch_size)
