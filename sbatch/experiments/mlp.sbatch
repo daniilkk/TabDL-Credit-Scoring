@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=$2           # Название задачи
-#SBATCH --error=output/$1-%j.err        # Файл для вывода ошибок
-#SBATCH --output=output/$1-%j.log       # Файл для вывода результатов
+#SBATCH --job-name=mlp           # Название задачи
+#SBATCH --error=output/mlp-%j.err        # Файл для вывода ошибок
+#SBATCH --output=output/mlp-%j.log       # Файл для вывода результатов
 
 #SBATCH --ntasks=1                # Количество MPI процессов
 #SBATCH --nodes=1                  # Требуемое кол-во узлов
@@ -18,6 +18,6 @@ source activate venv
 
 export PYTHONPATH=$(pwd)
 
-for _ in $(seq 1 $3); do
-    python src/run.py --config configs/$2.yaml
+for _ in $(seq 1 1); do
+    python -u src/run.py --config configs/mlp.yaml
 done
