@@ -8,7 +8,7 @@
 #SBATCH --nodes=1                  # Требуемое кол-во узлов
 #SBATCH --gpus=1                   # Требуемое кол-во GPU
 #SBATCH --cpus-per-task=8          # Требуемое кол-во CPU
-#SBATCH --time=30
+#SBATCH --time=100
 
 module purge
 module load Python
