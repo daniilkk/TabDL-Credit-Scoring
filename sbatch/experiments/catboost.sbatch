@@ -21,5 +21,5 @@ pip install -r requirements.txt
 export PYTHONPATH=$(pwd)
 
 for _ in $(seq 1 5); do
-    python -u src/run.py --config configs/catboost.yaml
+    python -u src/train.py --experiment catboost
 done

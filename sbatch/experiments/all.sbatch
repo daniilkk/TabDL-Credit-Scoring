@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=resnet_ple           # Название задачи
-#SBATCH --error=output/resnet_ple-%j.err        # Файл для вывода ошибок
-#SBATCH --output=output/resnet_ple.log       # Файл для вывода результатов
+#SBATCH --job-name=catboost           # Название задачи
+#SBATCH --error=output/catboost-%j.err        # Файл для вывода ошибок
+#SBATCH --output=output/catboost.log       # Файл для вывода результатов
 
 #SBATCH --ntasks=1                # Количество MPI процессов
 #SBATCH --nodes=1                  # Требуемое кол-во узлов
@@ -14,12 +14,15 @@ module purge
 module load Python
 
 deactivate
-source activate venv
+conda activate venv
 
 pip install -r requirements.txt
 
 export PYTHONPATH=$(pwd)
 
-for _ in $(seq 1 5); do
-    python -u src/train.py --experiment resnet_ple
+
+for exp_name in catboost mlp mlp_ple resnet resnet_ple ftt ftt_ple; do
+    for _ in $(seq 1 5); do
+        python -u src/train.py --experiment $exp_name
+    done
 done
