@@ -15,8 +15,6 @@ echo $SHELL
 module purge
 module load Python
 
-conda init bash
-
 deactivate
 conda activate venv
 
