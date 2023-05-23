@@ -31,7 +31,7 @@ class Trainer:
 
     def train(self, n_epochs: int, batch_size: int, report_frequency: int):
         self._create_checkpoints_dir()
-        self._save_datamodule()
+        self._save_split()
 
         train_dataloader = self.datamodule.get_dataloader('train', batch_size, shuffle=True)
         for epoch in range(1, n_epochs + 1):
@@ -98,11 +98,10 @@ class Trainer:
 
         return metrics, loss
     
-    def _save_datamodule(self):
+    def _save_split(self):
         save_path = os.path.join(self.run_dir, 'datamodule.pickle')
 
-        with open(save_path, 'wb') as f:
-            pickle.dump(self.datamodule, f)
+        self.datamodule.split.save(save_path)
     
     def _save_loss(self, epoch_losses: list):
         save_path = os.path.join(self.run_dir, 'loss.npy')

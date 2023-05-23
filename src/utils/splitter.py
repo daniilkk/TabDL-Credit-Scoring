@@ -1,7 +1,54 @@
+from __future__ import annotations
+
+import pickle
 from typing import List, Tuple
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+
+
+@dataclass
+class Split:
+    train: List[int]
+    val: List[int]
+    test: List[int]
+
+    def __post_init__(self):
+        train_set = set(self.train)
+        val_set = set(self.val)
+        test_set = set(self.test)
+
+        if len(train_set & val_set) > 0:
+            raise RuntimeError('Train and val have non-empty intersection.')
+        if len(train_set & test_set) > 0:
+            raise RuntimeError('Train and test have non-empty intersection.')
+        if len(val_set & test_set) > 0:
+            raise RuntimeError('Val and test have non-empty intersection.')
+    
+    def __call__(self, part_name: str) -> List[int]:
+        if not hasattr(self, part_name):
+            raise RuntimeError(f'Wrong part_name: {part_name}')
+        
+        return getattr(self, part_name)
+
+    def save(self, path: str):
+        with open(path, 'wb') as f:
+            pickle.dump({
+                'train': self.train,
+                'val': self.val,
+                'test': self.test,
+            }, f)
+
+    @classmethod
+    def load(cls, path: str) -> Split:
+        with open(path, 'rb') as f:
+            data = pickle.load(f)
+        
+        split = cls(data['train'], data['val'], data['test'])
+
+        return split
 
 
 class Splitter:
@@ -19,7 +66,7 @@ class Splitter:
 
         return cat_features, num_features
 
-    def split_rows(self, method: str, train_size: float):
+    def split_rows(self, method: str, train_size: float) -> Split:
         """Splits dataframe into three parts: train, val, test
 
         :param method: method for splitting. Must be one of [random, customer_id]
@@ -32,13 +79,9 @@ class Splitter:
         if train_size > 1 or train_size < 0:
             raise RuntimeError(f'Wrong train_size: "{train_size}". Must be in interval [0, 1]')
 
-        x, y = self.split_methods[method](train_size)
-
-        for split_name in ('train', 'val', 'test'):
-            if x[split_name].shape[0] != y[split_name].shape[0]:
-                raise RuntimeError('Something is wrong with x and y shapes')
+        split = self.split_methods[method](train_size)
         
-        return x, y
+        return split
 
     def _split_rows_randomly(self, train_size: float):
         indices = np.arange(len(self.all_data))
@@ -64,31 +107,37 @@ class Splitter:
 
         return x, y
 
-    def _split_rows_by_customer_id(self, train_size: float):
-        train_ids, val_test_ids = train_test_split(
+    def _split_rows_by_customer_id(self, train_size: float) -> Split:
+        train_customer_ids, val_test_customer_ids = train_test_split(
             self.all_data['Customer_ID'].unique(),
             train_size=train_size
         )
-        val_ids, test_ids = train_test_split(val_test_ids, train_size=0.5)
+        val_customer_ids, test_customer_ids = train_test_split(val_test_customer_ids, train_size=0.5)
 
-        train = self.all_data[self.all_data['Customer_ID'].isin(set(train_ids))]
-        val = self.all_data[self.all_data['Customer_ID'].isin(set(val_ids))]
-        test = self.all_data[self.all_data['Customer_ID'].isin(set(test_ids))]
+        train_ids = self.all_data.index[self.all_data['Customer_ID'].isin(set(train_customer_ids))].tolist()
+        val_ids = self.all_data.index[self.all_data['Customer_ID'].isin(set(val_customer_ids))].tolist()
+        test_ids = self.all_data.index[self.all_data['Customer_ID'].isin(set(test_customer_ids))].tolist()
 
-        train = train.drop(columns='Customer_ID')
-        test = test.drop(columns='Customer_ID')
-        val = val.drop(columns='Customer_ID')
+        return Split(train_ids, val_ids, test_ids)
 
-        y = {
-            'train': train['Credit_Score'],
-            'val': val['Credit_Score'],
-            'test': test['Credit_Score'],
-        }
+        # train = self.all_data[self.all_data['Customer_ID'].isin(set(train_customer_ids))]
+        # val = self.all_data[self.all_data['Customer_ID'].isin(set(val_customer_ids))]
+        # test = self.all_data[self.all_data['Customer_ID'].isin(set(test_customer_ids))]
 
-        x = {
-            'train': train.drop(columns='Credit_Score'),
-            'val': val.drop(columns='Credit_Score'),
-            'test': test.drop(columns='Credit_Score'),
-        }
+        # train = train.drop(columns='Customer_ID')
+        # test = test.drop(columns='Customer_ID')
+        # val = val.drop(columns='Customer_ID')
 
-        return x, y
+        # y = {
+        #     'train': train['Credit_Score'],
+        #     'val': val['Credit_Score'],
+        #     'test': test['Credit_Score'],
+        # }
+
+        # x = {
+        #     'train': train.drop(columns='Credit_Score'),
+        #     'val': val.drop(columns='Credit_Score'),
+        #     'test': test.drop(columns='Credit_Score'),
+        # }
+
+        # return x, y

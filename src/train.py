@@ -1,10 +1,7 @@
 import argparse
 import os
-import csv
-import shutil
 from importlib import import_module
 from typing import Dict, List, Tuple
-import pickle
 
 import numpy as np
 import pandas as pd
@@ -14,26 +11,36 @@ import torch.nn.functional as F
 from omegaconf import OmegaConf, DictConfig
 from catboost import CatBoostClassifier
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import roc_auc_score, precision_recall_curve, auc
 import rtdl
 
 from src.dataset import TabDataModule
 from src.ple import PiecewiseLinearEncoder
 from src.utils.metrics import compute_metrics, dump_metrics
-from src.utils.other import get_new_run_dir
+from src.utils.other import DATA_ROOT, get_model_creator, get_new_run_dir, load_experiment_config
 from src.utils.splitter import Splitter
 from src.trainer import Trainer
-
-
-DATA_ROOT = 'data/csv/'
-MODELS_ROOT = 'src/models'
 
 
 def train_catboost(config: DictConfig):
     data_path = os.path.join(DATA_ROOT, f'{config.data}.csv')
     data = pd.read_csv(data_path)
     
-    x, y = Splitter(data).split_rows(config.split_method, config.train_size)
+    split = Splitter(data).split_rows(config.split_method, config.train_size)
+
+    data = data.drop(columns='Customer_ID')
+
+    x = data.drop(columns='Credit_Score')
+    y = data['Credit_Score']
+
+    x = {
+        'train': x.iloc[split.train],
+        'test': x.iloc[split.test],
+    }
+
+    y = {
+        'train': y.iloc[split.train],
+        'test': y.iloc[split.test],
+    }
 
     label_encoder = LabelEncoder()
     y['train'] = label_encoder.fit_transform(y['train'])
@@ -71,7 +78,7 @@ def train_neural_model(config: DictConfig):
         cat_encoder= 'ordinal' if config.model_type == 'ft_transformer' else 'ohe',
     )
 
-    model_module = import_module(os.path.join(MODELS_ROOT, config.model).replace('/', '.'))
+    create_model = get_model_creator(config.model)
 
     create_model_kwargs = {
         'n_num_features': data_module.datasets['train'].n_features_num,
@@ -80,7 +87,7 @@ def train_neural_model(config: DictConfig):
         'dim_in': data_module.datasets['train'].n_features_all
     }
 
-    model = model_module.create_model(
+    model = create_model(
         config,
         **create_model_kwargs
     ).to(device)
@@ -113,8 +120,8 @@ def main(config: DictConfig):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, required=True, help='Path to the experiment config')
+    parser.add_argument('--experiment', type=str, required=True, help='Experiment name')
     
-    config = OmegaConf.load(parser.parse_args().config)
+    config = load_experiment_config(parser.parse_args().experiment)
 
     main(config)
