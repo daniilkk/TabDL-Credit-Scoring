@@ -10,6 +10,8 @@
 #SBATCH --cpus-per-task=8          # Требуемое кол-во CPU
 #SBATCH --time=1500
 
+echo $SHELL
+
 module purge
 module load Python
 
@@ -21,7 +23,6 @@ conda activate venv
 pip install -r requirements.txt
 
 export PYTHONPATH=$(pwd)
-
 
 for exp_name in catboost mlp mlp_ple resnet resnet_ple ftt ftt_ple; do
     for _ in $(seq 1 5); do
